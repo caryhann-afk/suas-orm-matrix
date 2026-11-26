@@ -393,6 +393,13 @@
       P(i).drawImage(img, { x: b[0] + pad + Math.min((bw - w) / 2, 6), y: Y(i, b[3]) + pad + (bh - h) / 2, width: w, height: h });
     }
 
+    // Form patches (e.g. renumbered flight boxes): cover the printed text, then print the replacement
+    for (const pt of (def.patches || [])) {
+      if (!pages[pt.page]) continue;
+      const c = pt.cover;
+      P(pt.page).drawRectangle({ x: c[0], y: Y(pt.page, c[3]), width: c[2] - c[0], height: c[3] - c[1], color: rgb(...(pt.bg || [1, 1, 1])), borderWidth: 0 });
+      text(pt.page, pt.box || c, pt.text, { bold: pt.bold, size: pt.size || 8, color: [0, 0, 0] });
+    }
     const v = st.v;
     for (const f of ALL) {
       if (!pages[f.page]) continue;

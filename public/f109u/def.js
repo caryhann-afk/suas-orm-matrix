@@ -32,7 +32,22 @@
     ];
   }
 
+  // Renumber the pre-printed flight boxes so they match the fill order, and retitle the columns to match.
+  const NUM_Y = [102.7, 175.9, 249.1, 322.3, 395.5, 468.7, 541.9];
+  const num = (page, x0, x1, n, k) => ({ page, cover: [x0, NUM_Y[k] - 1, x1, NUM_Y[k] + 9], text: String(n), size: 8 });
+  const GRAY = [0.801, 0.801, 0.801];
+  const title = (page, x0, x1, t) => ({ page, cover: [x0, 37.9, x1, 48.9], bg: GRAY, text: t, bold: true, size: 10 });
+  const PATCHES = [
+    ...NUM_Y.map((_, k) => num(0, 37, 61, k + 1, k)),      // page 1 left: 1–7 (printed 15–21)
+    ...NUM_Y.map((_, k) => num(1, 37, 61, k + 8, k)),      // sheet 2 left: 8–14 (printed 1–7)
+    ...NUM_Y.map((_, k) => num(1, 415, 439, k + 15, k)),   // sheet 2 right: 15–21 (printed 8–14)
+    title(0, 36.2, 380.3, 'sUAS SORTIE FLIGHT LOG'),
+    title(1, 36.2, 380.3, 'sUAS SORTIE FLIGHT LOG CONTINUED'),
+    title(1, 413.0, 759.5, 'IMAGERY / TARGET LOG CONTINUED'),
+  ];
+
   window.FORM_DEF = {
+    patches: PATCHES,
     id: 'capf-109u',
     code: 'CAPF 109U',
     title: 'sUAS Sortie Flight Summary & Log',
