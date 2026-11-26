@@ -306,18 +306,7 @@
     const out = await PDFDocument.create();
     const pages = [];
     for (const pg of def.pages) {
-      if (pg.halves) {
-        // Rebuild a landscape sheet from two half-pages of rotated booklet sheets, so pages read in order.
-        const p = out.addPage([792, 612]);
-        for (let h = 0; h < 2; h++) {
-          const { src: si, side } = pg.halves[h];
-          const sp = src.getPage(si);
-          const bb = side === 'L' ? { left: 0, bottom: 0, right: 612, top: 396 } : { left: 0, bottom: 396, right: 612, top: 792 };
-          const emb = await out.embedPage(sp, bb);
-          p.drawPage(emb, { x: h * 396, y: 612, rotate: degrees(-90) });
-        }
-        pages.push(p);
-      } else if (pg.rotate) {
+      if (pg.rotate) {
         const [emb] = await out.embedPages([src.getPage(pg.src)]);
         const p = out.addPage([emb.height, emb.width]);
         p.drawPage(emb, { x: 0, y: emb.width, rotate: degrees(-90) });
