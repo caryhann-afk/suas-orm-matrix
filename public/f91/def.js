@@ -19,7 +19,7 @@
         { type: 'date', id: 'checkDate', label: 'Date of flight check', page: 0, box: [384, 79, 547, 90], align: 'left', today: true },
         { type: 'text', id: 'memberName', label: "Member's name", page: 0, box: [74, 109, 221, 121], align: 'left', remember: true },
         { type: 'text', id: 'capid', label: 'CAPID', page: 0, box: [223, 109, 279, 121], inputmode: 'numeric', remember: true },
-        { type: 'text', id: 'charter', label: 'Charter no.', page: 0, box: [281, 109, 351, 121], remember: true },
+        { type: 'charter', id: 'charter', label: 'Charter no.', page: 0, box: [281, 109, 351, 121], remember: true },
         { type: 'date', id: 'icut', label: 'ICUT date', page: 0, box: [353, 109, 446, 121] },
         { type: 'date', id: 'form5', label: 'Form 5 annual date', page: 0, box: [448, 109, 548, 121] },
       ]},

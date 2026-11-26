@@ -28,7 +28,7 @@
       { title: 'Member', items: [
         { type: 'text', id: 'memberName', label: "Member's name", page: 0, box: [49, 98.5, 220, 111.5], align: 'left', remember: true },
         { type: 'text', id: 'capid', label: 'CAPID', page: 0, box: [221, 98.5, 270, 111.5], inputmode: 'numeric', remember: true },
-        { type: 'text', id: 'charter', label: 'Charter no.', page: 0, box: [270, 98.5, 345, 111.5], remember: true },
+        { type: 'charter', id: 'charter', label: 'Charter no.', page: 0, box: [270, 98.5, 345, 111.5], remember: true },
         { type: 'text', id: 'makeModel', label: 'sUAS make & model', page: 0, box: [409, 98.5, 570, 111.5], align: 'left' },
         { type: 'check', id: 'priv107', label: 'Privilege exercised: Part 107', page: 0, box: [351.66, 114.9, 358.62, 121.86] },
         { type: 'check', id: 'privRec', label: 'Privilege exercised: Recreational', page: 0, box: [351.66, 127.08, 358.62, 134.04] },

@@ -25,7 +25,11 @@
     ['Cadet — officer', ['C/2d Lt', 'C/1st Lt', 'C/Capt', 'C/Maj', 'C/Lt Col', 'C/Col']],
   ];
   // keys a field stores its value under (namegrade keeps grade and name separately)
-  const keysOf = f => f.type === 'namegrade' ? [f.id + '_grade', f.id + '_name'] : [f.id];
+  const CAP_REGIONS = [['NER', 'Northeast'], ['MAR', 'Middle East'], ['GLR', 'Great Lakes'], ['SER', 'Southeast'],
+    ['NCR', 'North Central'], ['SWR', 'Southwest'], ['RMR', 'Rocky Mountain'], ['PCR', 'Pacific Coast']];
+  const keysOf = f => f.type === 'namegrade' ? [f.id + '_grade', f.id + '_name']
+    : f.type === 'charter' ? [f.id + '_reg', f.id + '_wing', f.id + '_sq'] : [f.id];
+  const charterText = (v, f) => [v[f.id + '_reg'], v[f.id + '_wing'], v[f.id + '_sq']].map(x => String(x || '').trim().toUpperCase()).filter(Boolean).join('-');
   const GCOLOR = { S: [0.55, 0.88, 0.55], U: [1, 0.55, 0.45], V: [1, 0.86, 0.3], NP: [0.80, 0.82, 0.86], NA: [0.80, 0.82, 0.86] };
   const INK = [0, 0, 0.45];
 
@@ -59,6 +63,12 @@
   function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
   let S = load() || blank(null);
   // older saves kept "name & grade" in one box — move it into the name box
+  ALL.forEach(f => {
+    if (f.type === 'charter' && S.v[f.id] && !S.v[f.id + '_reg'] && !S.v[f.id + '_wing'] && !S.v[f.id + '_sq']) {
+      const [r, w, q] = String(S.v[f.id]).toUpperCase().split(/[-\s]+/);
+      S.v[f.id + '_reg'] = r || ''; S.v[f.id + '_wing'] = w || ''; S.v[f.id + '_sq'] = q || ''; delete S.v[f.id];
+    }
+  });
   ALL.forEach(f => { if (f.type === 'namegrade' && S.v[f.id] && !S.v[f.id + '_name']) { S.v[f.id + '_name'] = S.v[f.id]; delete S.v[f.id]; } });
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} invalidate(); }
 
@@ -143,7 +153,15 @@
     const auto = autoMin(f);
     return `<label class="fld">${esc(f.label)}<input data-id="${f.id}" data-auto-min="${f.id}" inputmode="numeric" value="${esc(S.v[f.id] || '')}" placeholder="${auto ? auto + ' (auto)' : 'Auto from times'}" autocomplete="off"></label>`;
   }
-  const RENDER = { minutes: minutesField, namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
+  function charterField(f) {
+    const reg = S.v[f.id + '_reg'] || '';
+    const opts = '<option value="">Region…</option>' + CAP_REGIONS.map(([k, n]) => `<option value="${k}"${k === reg ? ' selected' : ''}>${k} – ${n}</option>`).join('');
+    return `<div class="charter wide"><div class="rlabel">${esc(f.label)} <span class="hint">prints as ${esc(charterText(S.v, f) || 'SER-TN-173')}</span></div><div class="ch-row">
+      <label class="fld">Region<select data-id="${f.id}_reg">${opts}</select></label>
+      <label class="fld">Wing<input data-id="${f.id}_wing" data-upper maxlength="3" placeholder="TN" value="${esc(S.v[f.id + '_wing'] || '')}" autocomplete="off" autocapitalize="characters"></label>
+      <label class="fld">Squadron<input data-id="${f.id}_sq" inputmode="numeric" maxlength="4" placeholder="173" value="${esc(S.v[f.id + '_sq'] || '')}" autocomplete="off"></label></div></div>`;
+  }
+  const RENDER = { charter: charterField, minutes: minutesField, namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
     endorse: endorseField, radio: radioField, grade: gradeField, sig: sigField };
 
   function renderSection(sec, i) {
@@ -189,17 +207,23 @@
       <div class="score-cols"><span class="pill low">S <b>${c.S}</b></span><span class="pill high">U <b>${c.U}</b></span><span class="pill mod">V <b>${c.V}</b></span><span class="pill na">${GRADES[0].scale === 'suvnp' ? 'NP' : 'N/A'} <b>${na}</b></span></div>`;
   }
 
+  function refreshCharter() {
+    document.querySelectorAll('.charter').forEach((el, i) => {
+      const f = ALL.filter(x => x.type === 'charter')[i]; if (!f) return;
+      el.querySelector('.hint').textContent = 'prints as ' + (charterText(S.v, f) || 'SER-TN-173');
+    });
+  }
   // ---------- events ----------
   const main = () => $('#main');
   document.addEventListener('change', e => {
-    if (e.target.tagName === 'SELECT' && e.target.dataset.id) { S.v[e.target.dataset.id] = e.target.value; save(); }
+    if (e.target.tagName === 'SELECT' && e.target.dataset.id) { S.v[e.target.dataset.id] = e.target.value; save(); refreshCharter(); }
   });
   document.addEventListener('input', e => {
     const id = e.target.dataset && e.target.dataset.id;
     if (!id) return;
     let val = e.target.value;
-    if (/_init$/.test(id)) { val = val.toUpperCase(); e.target.value = val; }
-    S.v[id] = val; save();
+    if (/_init$/.test(id) || e.target.hasAttribute('data-upper')) { val = val.toUpperCase(); e.target.value = val; }
+    S.v[id] = val; save(); refreshCharter();
     document.querySelectorAll('[data-auto-min]').forEach(el => {
       const f = ALL.find(x => x.id === el.dataset.autoMin); const a = autoMin(f);
       el.placeholder = a ? a + ' (auto)' : 'Auto from times';
@@ -428,6 +452,7 @@
           break;
         }
         case 'date': text(f.page, f.box, fmtDate(val), { align: f.align, size: f.size }); break;
+        case 'charter': text(f.page, f.box, charterText(v, f), { align: f.align, size: f.size }); break;
         case 'minutes': text(f.page, f.box, (val && String(val).trim()) || autoMinFrom(v, f), { align: f.align, size: f.size }); break;
         case 'namegrade': text(f.page, f.box, [v[f.id + '_grade'], v[f.id + '_name']].filter(Boolean).join(' '), { align: f.align, size: f.size }); break;
         case 'textarea': para(f.page, f.box, val, f.size); break;
