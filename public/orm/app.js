@@ -388,7 +388,7 @@
   $('#iosHintClose').addEventListener('click', () => { $('#iosHint').hidden = true; localStorage.setItem('ios-hint-closed', '1'); });
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js', { scope: '../' }).catch(() => {}));
   }
 
   if (!state.header.date) state.header.date = today();

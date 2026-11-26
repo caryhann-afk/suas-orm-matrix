@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>sUAS ORM Matrix</title>
-<meta name="description" content="Fill out, score, sign and print the CAP sUAS Operational Risk Management Matrix.">
+<title>sUAS Forms</title>
+<meta name="description" content="Fill out, sign and print CAP sUAS forms.">
 <meta name="theme-color" content="#0b2a5b">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
@@ -12,20 +12,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="sUAS ORM">
-<link rel="stylesheet" href="app.css">
+<meta name="apple-mobile-web-app-title" content="sUAS Forms">
+<link rel="stylesheet" href="hub.css">
 </head>
 <body>
 <header class="top">
   <div class="top-inner">
     <div>
-      <div class="eyebrow">Civil Air Patrol · sUAS</div>
-      <h1>Operational Risk Management Matrix</h1>
+      <div class="eyebrow">Civil Air Patrol</div>
+      <h1>sUAS Forms</h1>
     </div>
-    <div class="top-actions">
-      <button id="installBtn" class="ghost" hidden>Install</button>
-      <button id="newBtn" class="ghost">New form</button>
-    </div>
+    <button id="installBtn" class="ghost" hidden>Install</button>
   </div>
 </header>
 
@@ -35,127 +32,35 @@
 </div>
 
 <main>
-  <section class="card" id="sec-header">
-    <h2>Sortie information</h2>
-    <div class="grid3">
-      <label>Mission number<input id="h-mission" autocomplete="off"></label>
-      <label>Sortie<input id="h-sortie" autocomplete="off"></label>
-      <label>Date<input id="h-date" type="date"></label>
-    </div>
-    <h3>sUAS Pilot in Command</h3>
-    <div class="grid3">
-      <label>Name<input id="h-picName" autocomplete="name"></label>
-      <label>CAPID<input id="h-picCapid" inputmode="numeric"></label>
-      <div class="initials">
-        <label>Initials<input id="h-picInit" maxlength="4"></label>
-        <button class="small" data-sign="picInit">Draw</button>
-        <img class="thumb" id="img-picInit" alt="" hidden>
-      </div>
-    </div>
-    <h3>Air Operations Branch Director</h3>
-    <div class="grid3">
-      <label>Name<input id="h-aobdName"></label>
-      <label>CAPID<input id="h-aobdCapid" inputmode="numeric"></label>
-      <div class="initials">
-        <label>Initials<input id="h-aobdInit" maxlength="4"></label>
-        <button class="small" data-sign="aobdInit">Draw</button>
-        <img class="thumb" id="img-aobdInit" alt="" hidden>
-      </div>
-    </div>
-    <label class="check"><input type="checkbox" id="rememberMe"> Remember PIC and AOBD on this device</label>
-  </section>
+  <p class="intro">Pick a form to fill out. Each one scores, signs and prints on the official CAP form.</p>
 
-  <div id="matrix"></div>
-
-  <section class="card" id="sec-approval">
-    <h2>Overall risk assessment &amp; approval</h2>
-    <div id="riskBands" class="bands"></div>
-    <div id="ngNotice" class="ng-notice" hidden></div>
-    <div class="grid3">
-      <label>Sign in row
-        <select id="ap-row">
-          <option value="auto">Match the score (automatic)</option>
-          <option value="low">Low risk – Briefing Officer</option>
-          <option value="mod">Moderate risk – AOBD/OSC</option>
-          <option value="high">High risk – Wing/CC, DO, DOU or IC</option>
-          <option value="none">Leave signature blank</option>
-        </select>
-      </label>
-      <label>Approver name / grade (optional)<input id="ap-name"></label>
-      <label>Approval date<input id="ap-date" type="date"></label>
-    </div>
-    <div class="sig-row">
-      <div class="sig-box" id="sigBox">
-        <img id="img-approvalSig" alt="Approval signature" hidden>
-        <span id="sigEmpty">No signature yet</span>
-      </div>
-      <div class="sig-actions">
-        <button data-sign="approvalSig" class="primary-outline">Sign</button>
-        <button id="sigClear" class="small">Clear</button>
-      </div>
-    </div>
-    <label class="check"><input type="checkbox" id="ap-phone"> Phone approval — print “signature to follow” if not signed</label>
-  </section>
-
-  <section class="card" id="sec-output">
-    <h2>Get the completed form</h2>
-    <p class="muted" id="outNote">Fills in the official CAP form exactly, color-coded, with your signatures.</p>
-    <div class="out-actions">
-      <button id="previewBtn" class="primary">Preview</button>
-      <button id="downloadBtn">Download PDF</button>
-      <button id="printBtn">Print</button>
-      <button id="shareBtn" hidden>Share / Save</button>
-    </div>
-  </section>
-  <p class="foot muted">Works offline once loaded. Data stays on this device.</p>
+  <!-- FORMS LIST: add a new <a class="form-card"> block for each form -->
+  <nav class="forms">
+    <a class="form-card" href="orm/">
+      <span class="badge">ORM</span>
+      <span class="form-text">
+        <span class="form-name">sUAS Operational Risk Management Matrix</span>
+        <span class="form-desc">Score hazards, get the risk level and approval authority, sign, and print.</span>
+      </span>
+      <span class="chev" aria-hidden="true">›</span>
+    </a>
+  </nav>
 </main>
+<p class="foot">Works offline once loaded. Data stays on this device.</p>
 
-<footer class="scorebar" id="scorebar">
-  <button class="score-main" id="scoreJump" aria-label="Jump to next unanswered item">
-    <span class="score-num" id="scoreNum">—</span>
-    <span class="score-text">
-      <span id="scoreRisk">Not started</span>
-      <span class="score-sub" id="scoreSub">0 of 21 answered</span>
-    </span>
-  </button>
-  <div class="score-cols">
-    <span class="pill low" title="Low points">L <b id="tLow">0</b></span>
-    <span class="pill mod" title="Moderate points">M <b id="tMod">0</b></span>
-    <span class="pill high" title="High points">H <b id="tHigh">0</b></span>
-  </div>
-</footer>
-
-<!-- Signature modal -->
-<div class="modal" id="sigModal" hidden>
-  <div class="modal-card sig-card">
-    <div class="modal-head">
-      <h2 id="sigTitle">Sign</h2>
-      <button class="x" id="sigCancel" aria-label="Close">×</button>
-    </div>
-    <p class="muted small-text" id="sigHelp">Sign with your finger, stylus or mouse.</p>
-    <div class="pad-wrap"><canvas id="pad"></canvas><div class="pad-line"></div></div>
-    <div class="modal-foot">
-      <button id="padClear">Clear</button>
-      <button id="padSave" class="primary">Use signature</button>
-    </div>
-  </div>
-</div>
-
-<!-- Preview modal -->
-<div class="modal" id="pvModal" hidden>
-  <div class="modal-card pv-card">
-    <div class="modal-head">
-      <h2>Preview</h2>
-      <button class="x" id="pvClose" aria-label="Close">×</button>
-    </div>
-    <iframe id="pvFrame" title="PDF preview"></iframe>
-  </div>
-</div>
-
-<div class="toast" id="toast" hidden></div>
-
-<script src="vendor/pdf-lib.min.js"></script>
-<script src="orm.js"></script>
-<script src="app.js"></script>
+<script>
+(function () {
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  let deferred = null;
+  const btn = document.getElementById('installBtn');
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; btn.hidden = false; });
+  btn.addEventListener('click', async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; btn.hidden = true; });
+  const hint = document.getElementById('iosHint');
+  try { if (isIOS && !standalone && !localStorage.getItem('ios-hint-closed')) hint.hidden = false; } catch (e) {}
+  document.getElementById('iosHintClose').addEventListener('click', () => { hint.hidden = true; try { localStorage.setItem('ios-hint-closed', '1'); } catch (e) {} });
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+})();
+</script>
 </body>
 </html>

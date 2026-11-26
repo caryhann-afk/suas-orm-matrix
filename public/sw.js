@@ -1,7 +1,8 @@
 // Offline cache. Bump VERSION whenever you change any file so phones pick up the update.
-const VERSION = 'orm-v1';
-const ASSETS = ['./', 'index.html', 'app.css', 'app.js', 'orm.js', 'form.pdf', 'vendor/pdf-lib.min.js',
-  'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const VERSION = 'suas-forms-v2';
+const ASSETS = ['./', 'index.html', 'hub.css', 'manifest.webmanifest', 'vendor/pdf-lib.min.js',
+  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  'orm/', 'orm/index.html', 'orm/app.css', 'orm/app.js', 'orm/orm.js', 'orm/form.pdf'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -18,6 +19,6 @@ self.addEventListener('fetch', e => {
     fetch(req).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
       return res;
-    }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match('index.html')))
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match(new URL(req.url).pathname.startsWith('/orm') ? 'orm/index.html' : 'index.html')))
   );
 });

@@ -25,6 +25,7 @@ button { cursor: pointer; }
 
 .top { background: var(--navy); color: #fff; padding: env(safe-area-inset-top, 0) 0 0; position: relative; }
 .top-inner { max-width: 980px; margin: 0 auto; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.back { color: #fff; text-decoration: none; display: inline-block; padding: 4px 0; }
 .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
 h1 { font-size: 19px; margin: 2px 0 0; font-weight: 700; }
 .top-actions { display: flex; gap: 8px; }
