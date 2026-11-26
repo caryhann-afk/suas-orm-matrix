@@ -214,3 +214,10 @@ textarea:focus { outline: 2px solid var(--navy-2); border-color: transparent; }
 .score-num { min-width: 70px; }
 .rep .fields { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 .endorse .init::placeholder { text-transform: none; }
+
+/* Home button */
+.title-wrap { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.home-btn { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 52px; height: 48px;
+  border-radius: 11px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.35); color: #fff; text-decoration: none; font-size: 11px; font-weight: 700; }
+.home-btn:active { background: rgba(255,255,255,.28); }
+@media (max-width: 420px) { .top-inner h1 { font-size: 17px; } .top-inner .ghost { padding: 7px 9px; font-size: 13px; } }
