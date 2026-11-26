@@ -1,0 +1,7 @@
+{
+  "name": "suas-orm-matrix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CAP sUAS Operational Risk Management Matrix - installable web app",
+  "scripts": { "deploy": "wrangler deploy" }
+}

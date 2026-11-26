@@ -1,0 +1,15 @@
+{
+  "name": "sUAS ORM Matrix",
+  "short_name": "sUAS ORM",
+  "description": "Fill out, score, sign and print the CAP sUAS Operational Risk Management Matrix.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f4f8",
+  "theme_color": "#0b2a5b",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
