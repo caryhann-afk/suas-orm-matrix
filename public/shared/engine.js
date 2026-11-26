@@ -181,10 +181,10 @@
   function charterField(f) {
     const reg = S.v[f.id + '_reg'] || '';
     const opts = '<option value="">Region…</option>' + CAP_REGIONS.map(([k, n]) => `<option value="${k}"${k === reg ? ' selected' : ''}>${k} – ${n}</option>`).join('');
-    return `<div class="charter wide"><div class="rlabel">${esc(f.label)} <span class="hint">prints as ${esc(charterText(S.v, f) || 'SER-TN-173')}</span></div><div class="ch-row">
+    return `<div class="charter wide"><div class="rlabel">${esc(f.label)} <span class="hint">${charterText(S.v, f) ? 'prints as ' + esc(charterText(S.v, f)) : ''}</span></div><div class="ch-row">
       <label class="fld">Region<select data-id="${f.id}_reg">${opts}</select></label>
       <label class="fld">Wing<select data-id="${f.id}_wing">${wingOptions(reg, S.v[f.id + '_wing'] || '')}</select></label>
-      <label class="fld">Squadron<input data-id="${f.id}_sq" inputmode="numeric" maxlength="4" placeholder="173" value="${esc(S.v[f.id + '_sq'] || '')}" autocomplete="off"></label></div></div>`;
+      <label class="fld">Squadron<input data-id="${f.id}_sq" inputmode="numeric" maxlength="4" value="${esc(S.v[f.id + '_sq'] || '')}" autocomplete="off"></label></div></div>`;
   }
   const RENDER = { charter: charterField, minutes: minutesField, namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
     endorse: endorseField, radio: radioField, grade: gradeField, sig: sigField };
@@ -235,7 +235,7 @@
   function refreshCharter() {
     document.querySelectorAll('.charter').forEach((el, i) => {
       const f = ALL.filter(x => x.type === 'charter')[i]; if (!f) return;
-      el.querySelector('.hint').textContent = 'prints as ' + (charterText(S.v, f) || 'SER-TN-173');
+      const t = charterText(S.v, f); el.querySelector('.hint').textContent = t ? 'prints as ' + t : '';
     });
   }
   // ---------- events ----------
