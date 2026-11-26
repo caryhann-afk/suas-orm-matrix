@@ -9,10 +9,11 @@
     [342, 366.5, 391, 415.5], [415.5, 440, 464, 488.5], [488.5, 513, 537.5, 562]];
   const LEFT = [63, 142.5, 222.5, 306, 381.5];
   const RIGHT = LEFT.map(x => x + 378);
+  // Data fills in reading order: flights 1–7 in the first sheet's left column, 8–14 and 15–21 on the second sheet.
   function where(n) {
-    if (n <= 7) return { page: 1, xs: LEFT, b: BLOCKS[n - 1] };
-    if (n <= 14) return { page: 1, xs: RIGHT, b: BLOCKS[n - 8] };
-    return { page: 0, xs: LEFT, b: BLOCKS[n - 15] };
+    if (n <= 7) return { page: 0, xs: LEFT, b: BLOCKS[n - 1] };
+    if (n <= 14) return { page: 1, xs: LEFT, b: BLOCKS[n - 8] };
+    return { page: 1, xs: RIGHT, b: BLOCKS[n - 15] };
   }
   const cell = (x0, x1, y0, y1, pad) => [x0 + 2.5, y0 + pad, x1 - 2, y1 - 0.8];
   function flight(n) {
