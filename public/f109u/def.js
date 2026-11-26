@@ -1,6 +1,6 @@
 /* CAPF 109U — sUAS Sortie Flight Summary / Flight Log (NOV 18).
    The original is a printed booklet stored as rotated pages; the app straightens them to landscape (792 x 612).
-   Output page 0 = [Flights 15–21 | Summary (page 1 of 4)], output page 1 = [Flights 1–7 | Flights 8–14].
+   The app re-pairs the halves so output page 0 = [Summary (page 1) | Flights 1–7 (page 2)], output page 1 = [Flights 8–14 (page 3) | Flights 15–21 (page 4)].
    Coordinates: PDF points from the top-left of the straightened landscape page. */
 (function () {
   // Row lines of each 7-flight column (block top, row 2 top, row 3 top, block bottom)
@@ -9,11 +9,14 @@
     [342, 366.5, 391, 415.5], [415.5, 440, 464, 488.5], [488.5, 513, 537.5, 562]];
   const LEFT = [63, 142.5, 222.5, 306, 381.5];
   const RIGHT = LEFT.map(x => x + 378);
+  // Halves are moved so the PDF reads in page order: sheet 1 = [Summary p1 | Flights 1–7 p2], sheet 2 = [Flights 8–14 p3 | Flights 15–21 p4].
+  const MOVE_RIGHT = LEFT.map(x => x + 396), MOVE_LEFT = RIGHT.map(x => x - 396);
   function where(n) {
-    if (n <= 7) return { page: 1, xs: LEFT, b: BLOCKS[n - 1] };
-    if (n <= 14) return { page: 1, xs: RIGHT, b: BLOCKS[n - 8] };
-    return { page: 0, xs: LEFT, b: BLOCKS[n - 15] };
+    if (n <= 7) return { page: 0, xs: MOVE_RIGHT, b: BLOCKS[n - 1] };
+    if (n <= 14) return { page: 1, xs: MOVE_LEFT, b: BLOCKS[n - 8] };
+    return { page: 1, xs: MOVE_RIGHT, b: BLOCKS[n - 15] };
   }
+  const S = b => [b[0] - 396, b[1], b[2] - 396, b[3]]; // summary moves from the right half to the left half
   const cell = (x0, x1, y0, y1, pad) => [x0 + 2.5, y0 + pad, x1 - 2, y1 - 0.8];
   function flight(n) {
     const { page, xs, b } = where(n);
@@ -36,16 +39,16 @@
     code: 'CAPF 109U',
     title: 'sUAS Sortie Flight Summary & Log',
     pdf: 'form.pdf',
-    pages: [{ src: 0, rotate: 90 }, { src: 1, rotate: 90 }],
+    pages: [{ halves: [{ src: 0, side: 'R' }, { src: 1, side: 'L' }] }, { halves: [{ src: 1, side: 'R' }, { src: 0, side: 'L' }] }],
     landscape: true,
     fileName: s => ['CAPF109U', s.missionNo, s.sortieNo, s.missionDate].filter(Boolean).join('_'),
     sections: [
       { title: 'Mission data', items: [
-        { type: 'text', id: 'sortieNo', label: 'Sortie number', page: 0, box: [675, 48.5, 756, 59.5] },
-        { type: 'text', id: 'missionNo', label: 'Mission number', page: 0, box: [415, 83, 482.5, 96] },
-        { type: 'date', id: 'missionDate', label: 'Mission date', page: 0, box: [486, 83, 557, 96], today: true },
-        { type: 'text', id: 'suasmp', label: 'sUASMP reporting (name & CAPID)', page: 0, box: [560, 83, 756, 96], align: 'left', remember: true },
-        { type: 'textarea', id: 'targets', label: 'Targets & requirements', page: 0, box: [416, 113, 755, 558], size: 9.5, rows: 6 },
+        { type: 'text', id: 'sortieNo', label: 'Sortie number', page: 0, box: S([675, 48.5, 756, 59.5]) },
+        { type: 'text', id: 'missionNo', label: 'Mission number', page: 0, box: S([415, 83, 482.5, 96]) },
+        { type: 'date', id: 'missionDate', label: 'Mission date', page: 0, box: S([486, 83, 557, 96]), today: true },
+        { type: 'text', id: 'suasmp', label: 'sUASMP reporting (name & CAPID)', page: 0, box: S([560, 83, 756, 96]), align: 'left', remember: true },
+        { type: 'textarea', id: 'targets', label: 'Targets & requirements', page: 0, box: S([416, 113, 755, 558]), size: 9.5, rows: 6 },
       ]},
       { title: 'Flights', repeat: { count: 21, noun: 'Flight', items: flight } },
     ],
