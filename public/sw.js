@@ -1,5 +1,5 @@
 // Offline cache. Bump VERSION whenever you change any file so phones pick up the update.
-const VERSION = 'suas-forms-v5';
+const VERSION = 'suas-forms-v6';
 const ASSETS = ['./', 'index.html', 'hub.css', 'manifest.webmanifest', 'vendor/pdf-lib.min.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'orm/', 'orm/index.html', 'orm/app.css', 'orm/app.js', 'orm/orm.js', 'orm/form.pdf',

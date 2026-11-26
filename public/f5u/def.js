@@ -125,13 +125,13 @@
       ]},
       { title: 'Member certification', note: 'I certify that I have read and understand all applicable FAA, CAP, and state regulations pertaining to flying subject sUAS aircraft. I acknowledge any restrictions or training requirements stated on this CAPF 5. I also understand that maintaining currency, recurring requirements, and compliance with applicable directives is my personal responsibility.', items: [
         { type: 'date', id: 'memberSigDate', label: 'Date', page: 1, box: [50, 160, 161, 174], align: 'left' },
-        { type: 'text', id: 'memberNameGrade', label: "Member's name & grade", page: 1, box: [163, 160, 341, 174], align: 'left', remember: true },
+        { type: 'namegrade', id: 'memberNameGrade', label: "Member's grade & name", page: 1, box: [163, 160, 341, 174], align: 'left', remember: true },
         { type: 'sig', id: 'memberSig', label: "Member's signature", page: 1, box: [344, 151, 561, 175] },
       ]},
       { title: 'Evaluator certification', note: 'I certify that I have administered a CAP flight evaluation as indicated and that the above-named CAP member has demonstrated the proficiency required to fly the indicated aircraft. The member also successfully completed the questionnaire for the make and model of aircraft flown. If the applicant fails, enter UNSATISFACTORY instead of signing.', items: [
         { type: 'textarea', id: 'evalRemarks', label: 'Remarks (optional — prints in the blank box)', page: 1, box: [50, 224, 561, 274], size: 9 },
         { type: 'date', id: 'evalSigDate', label: 'Date', page: 1, box: [50, 286, 161, 300], align: 'left' },
-        { type: 'text', id: 'evalNameGrade', label: "Evaluator's name & grade", page: 1, box: [163, 286, 341, 300], align: 'left' },
+        { type: 'namegrade', id: 'evalNameGrade', label: "Evaluator's grade & name", page: 1, box: [163, 286, 341, 300], align: 'left' },
         { type: 'sig', id: 'evalSig', label: "Evaluator's signature", page: 1, box: [344, 277, 561, 301], unsatText: true },
       ]},
     ],

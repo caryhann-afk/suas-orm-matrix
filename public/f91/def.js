@@ -84,7 +84,7 @@
       { title: 'Evaluator', items: [
         { type: 'date', id: 'evalDate', label: 'Date', page: 0, box: [73, 672, 134, 690] },
         { type: 'text', id: 'flightTime', label: 'Flight time', page: 0, box: [136, 672, 201, 690], inputmode: 'decimal' },
-        { type: 'text', id: 'evalNameGrade', label: "Evaluator's name & grade", page: 0, box: [204, 672, 332, 690], align: 'left' },
+        { type: 'namegrade', id: 'evalNameGrade', label: "Evaluator's grade & name", page: 0, box: [204, 672, 332, 690], align: 'left' },
         { type: 'text', id: 'evalCapid', label: 'Evaluator CAPID', page: 0, box: [334, 672, 395, 690], inputmode: 'numeric' },
         { type: 'sig', id: 'evalSig', label: "Evaluator's signature", page: 0, box: [397, 668, 548, 691] },
       ]},

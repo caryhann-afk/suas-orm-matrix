@@ -230,3 +230,7 @@ input[type="date"], input[type="time"] {
 }
 input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
 input[type="date"]::-webkit-datetime-edit, input[type="time"]::-webkit-datetime-edit { padding: 0; }
+.ng-row { display: grid; grid-template-columns: minmax(120px, 0.8fr) 2fr; gap: 10px; }
+@media (max-width: 360px) { .ng-row { grid-template-columns: 1fr; } }
+select { -webkit-appearance: none; appearance: none; height: 44px; padding-right: 30px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235b6878' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 11px center; }

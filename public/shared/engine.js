@@ -14,6 +14,18 @@
     suvna: [['S', 'S', 'Satisfactory'], ['U', 'U', 'Unsatisfactory'], ['V', 'V', 'Verbally briefed'], ['NA', 'N/A', 'Not applicable']],
   };
   const GCLASS = { S: 'gs', U: 'gu', V: 'gv', NP: 'gn', NA: 'gn' };
+  // CAP grades (CAPR 35-5 abbreviations)
+  const CAP_GRADES = [
+    ['Senior member — officer', ['2d Lt', '1st Lt', 'Capt', 'Maj', 'Lt Col', 'Col', 'Brig Gen', 'Maj Gen']],
+    ['Senior member — flight officer', ['FO', 'TFO', 'SFO']],
+    ['Senior member — NCO', ['SSgt', 'TSgt', 'MSgt', 'SMSgt', 'CMSgt']],
+    ['Senior member — no grade', ['SM']],
+    ['Cadet — airman', ['C/AB', 'C/Amn', 'C/A1C', 'C/SrA']],
+    ['Cadet — NCO', ['C/SSgt', 'C/TSgt', 'C/MSgt', 'C/SMSgt', 'C/CMSgt']],
+    ['Cadet — officer', ['C/2d Lt', 'C/1st Lt', 'C/Capt', 'C/Maj', 'C/Lt Col', 'C/Col']],
+  ];
+  // keys a field stores its value under (namegrade keeps grade and name separately)
+  const keysOf = f => f.type === 'namegrade' ? [f.id + '_grade', f.id + '_name'] : [f.id];
   const GCOLOR = { S: [0.55, 0.88, 0.55], U: [1, 0.55, 0.45], V: [1, 0.86, 0.3], NP: [0.80, 0.82, 0.86], NA: [0.80, 0.82, 0.86] };
   const INK = [0, 0, 0.45];
 
@@ -39,13 +51,15 @@
     const s = { v: {}, img: {}, shown: {} };
     ALL.forEach(f => {
       if (f.today) s.v[f.id] = today();
-      if (f.remember && prev && prev.v[f.id]) s.v[f.id] = prev.v[f.id];
+      if (f.remember && prev) keysOf(f).forEach(k => { if (prev.v[k]) s.v[k] = prev.v[k]; });
     });
     DEF.sections.forEach((sec, i) => { if (sec.repeat) s.shown[i] = 1; });
     return s;
   }
   function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
   let S = load() || blank(null);
+  // older saves kept "name & grade" in one box — move it into the name box
+  ALL.forEach(f => { if (f.type === 'namegrade' && S.v[f.id] && !S.v[f.id + '_name']) { S.v[f.id + '_name'] = S.v[f.id]; delete S.v[f.id]; } });
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} invalidate(); }
 
   // ---------- page chrome ----------
@@ -106,7 +120,17 @@
       <div class="sig-row"><div class="sig-box">${img ? `<img src="${img}" alt="">` : '<span>Not signed</span>'}</div>
       <div class="sig-actions"><button type="button" class="primary-outline" data-sign="${f.id}">Sign</button><button type="button" class="small" data-sigclear="${f.id}">Clear</button></div></div>${unsat}</div>`;
   }
-  const RENDER = { text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
+  function nameGradeField(f) {
+    const g = S.v[f.id + '_grade'] || '';
+    const known = CAP_GRADES.some(([, list]) => list.includes(g));
+    const opts = '<option value="">Select grade…</option>' + CAP_GRADES.map(([grp, list]) =>
+      `<optgroup label="${esc(grp)}">${list.map(x => `<option${x === g ? ' selected' : ''}>${esc(x)}</option>`).join('')}</optgroup>`).join('')
+      + (g && !known ? `<option selected>${esc(g)}</option>` : '');
+    return `<div class="namegrade wide"><div class="rlabel">${esc(f.label)}</div><div class="ng-row">
+      <label class="fld">Grade<select data-id="${f.id}_grade">${opts}</select></label>
+      <label class="fld">Name<input data-id="${f.id}_name" value="${esc(S.v[f.id + '_name'] || '')}" autocomplete="name" placeholder="First M. Last"></label></div></div>`;
+  }
+  const RENDER = { namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
     endorse: endorseField, radio: radioField, grade: gradeField, sig: sigField };
 
   function renderSection(sec, i) {
@@ -154,6 +178,9 @@
 
   // ---------- events ----------
   const main = () => $('#main');
+  document.addEventListener('change', e => {
+    if (e.target.tagName === 'SELECT' && e.target.dataset.id) { S.v[e.target.dataset.id] = e.target.value; save(); }
+  });
   document.addEventListener('input', e => {
     const id = e.target.dataset && e.target.dataset.id;
     if (!id) return;
@@ -375,6 +402,7 @@
           break;
         }
         case 'date': text(f.page, f.box, fmtDate(val), { align: f.align, size: f.size }); break;
+        case 'namegrade': text(f.page, f.box, [v[f.id + '_grade'], v[f.id + '_name']].filter(Boolean).join(' '), { align: f.align, size: f.size }); break;
         case 'textarea': para(f.page, f.box, val, f.size); break;
         case 'check': if (val) xmark(f.page, f.box); break;
         case 'endorse':
