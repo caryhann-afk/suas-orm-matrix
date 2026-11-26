@@ -306,6 +306,7 @@
     const out = await PDFDocument.create();
     const pages = [];
     for (const pg of def.pages) {
+      if (pg.when && !pg.when(st.v)) { pages.push(null); continue; } // optional page with nothing on it
       if (pg.rotate) {
         const [emb] = await out.embedPages([src.getPage(pg.src)]);
         const p = out.addPage([emb.height, emb.width]);
@@ -394,6 +395,7 @@
 
     const v = st.v;
     for (const f of ALL) {
+      if (!pages[f.page]) continue;
       const val = v[f.id];
       switch (f.type) {
         case 'text': case 'time': {
@@ -411,7 +413,7 @@
           break;
         case 'radio': {
           const o = f.options.find(o => o.value === val);
-          if (o) { xmark(o.page, o.box); if (f.initials && v[f.id + '_init']) text(o.page, o.initBox, v[f.id + '_init'], { bold: true, size: 8.5 }); }
+          if (o && pages[o.page]) { xmark(o.page, o.box); if (f.initials && v[f.id + '_init']) text(o.page, o.initBox, v[f.id + '_init'], { bold: true, size: 8.5 }); }
           break;
         }
         case 'grade': {

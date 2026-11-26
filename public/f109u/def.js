@@ -37,7 +37,9 @@
     code: 'CAPF 109U',
     title: 'sUAS Sortie Flight Summary & Log',
     pdf: 'form.pdf',
-    pages: [{ src: 0, rotate: 90 }, { src: 1, rotate: 90 }],
+    pages: [{ src: 0, rotate: 90 },
+            // second sheet only when flights 8–21 have something entered
+            { src: 1, rotate: 90, when: v => Object.keys(v).some(k => { const m = /^f(\d+)_/.exec(k); return m && +m[1] >= 8 && String(v[k]).trim(); }) }],
     landscape: true,
     fileName: s => ['CAPF109U', s.missionNo, s.sortieNo, s.missionDate].filter(Boolean).join('_'),
     sections: [
