@@ -25,8 +25,27 @@
     ['Cadet — officer', ['C/2d Lt', 'C/1st Lt', 'C/Capt', 'C/Maj', 'C/Lt Col', 'C/Col']],
   ];
   // keys a field stores its value under (namegrade keeps grade and name separately)
-  const CAP_REGIONS = [['NER', 'Northeast'], ['MAR', 'Middle East'], ['GLR', 'Great Lakes'], ['SER', 'Southeast'],
-    ['NCR', 'North Central'], ['SWR', 'Southwest'], ['RMR', 'Rocky Mountain'], ['PCR', 'Pacific Coast']];
+  const CAP_REGIONS = [['NER', 'Northeast'], ['MAR', 'Mid-Atlantic'], ['GLR', 'Great Lakes'], ['SER', 'Southeast'],
+    ['NCR', 'North Central'], ['SWR', 'Southwest'], ['RMR', 'Rocky Mountain'], ['PCR', 'Pacific']];
+  // Wings (charter abbreviations) in each region
+  const CAP_WINGS = {
+    NER: ['CT', 'MA', 'ME', 'NH', 'NJ', 'NY', 'PA', 'RI', 'VT'],
+    MAR: ['DC', 'DE', 'MD', 'NC', 'SC', 'VA', 'WV'],
+    GLR: ['IL', 'IN', 'KY', 'MI', 'OH', 'WI'],
+    SER: ['AL', 'FL', 'GA', 'MS', 'PR', 'TN'],
+    NCR: ['IA', 'KS', 'MN', 'MO', 'ND', 'NE', 'SD'],
+    SWR: ['AR', 'AZ', 'LA', 'NM', 'OK', 'TX'],
+    RMR: ['CO', 'ID', 'MT', 'UT', 'WY'],
+    PCR: ['AK', 'CA', 'HI', 'NV', 'OR', 'WA'],
+  };
+  const WING_NAMES = { AK: 'Alaska', AL: 'Alabama', AR: 'Arkansas', AZ: 'Arizona', CA: 'California', CO: 'Colorado', CT: 'Connecticut',
+    DC: 'National Capital', DE: 'Delaware', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', IA: 'Iowa', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana',
+    KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', MA: 'Massachusetts', MD: 'Maryland', ME: 'Maine', MI: 'Michigan', MN: 'Minnesota',
+    MO: 'Missouri', MS: 'Mississippi', MT: 'Montana', NC: 'North Carolina', ND: 'North Dakota', NE: 'Nebraska', NH: 'New Hampshire',
+    NJ: 'New Jersey', NM: 'New Mexico', NV: 'Nevada', NY: 'New York', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania',
+    PR: 'Puerto Rico', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah',
+    VA: 'Virginia', VT: 'Vermont', WA: 'Washington', WI: 'Wisconsin', WV: 'West Virginia', WY: 'Wyoming' };
+  const regionOfWing = w => Object.keys(CAP_WINGS).find(r => CAP_WINGS[r].includes(w)) || '';
   const keysOf = f => f.type === 'namegrade' ? [f.id + '_grade', f.id + '_name']
     : f.type === 'charter' ? [f.id + '_reg', f.id + '_wing', f.id + '_sq'] : [f.id];
   const charterText = (v, f) => [v[f.id + '_reg'], v[f.id + '_wing'], v[f.id + '_sq']].map(x => String(x || '').trim().toUpperCase()).filter(Boolean).join('-');
@@ -153,12 +172,18 @@
     const auto = autoMin(f);
     return `<label class="fld">${esc(f.label)}<input data-id="${f.id}" data-auto-min="${f.id}" inputmode="numeric" value="${esc(S.v[f.id] || '')}" placeholder="${auto ? auto + ' (auto)' : 'Auto from times'}" autocomplete="off"></label>`;
   }
+  function wingOptions(reg, cur) {
+    const opt = w => `<option value="${w}"${w === cur ? ' selected' : ''}>${w} – ${WING_NAMES[w]}</option>`;
+    const head = '<option value="">Wing…</option>';
+    if (reg && CAP_WINGS[reg]) return head + CAP_WINGS[reg].map(opt).join('');
+    return head + CAP_REGIONS.map(([r, n]) => `<optgroup label="${r} – ${n}">${CAP_WINGS[r].map(opt).join('')}</optgroup>`).join('');
+  }
   function charterField(f) {
     const reg = S.v[f.id + '_reg'] || '';
     const opts = '<option value="">Region…</option>' + CAP_REGIONS.map(([k, n]) => `<option value="${k}"${k === reg ? ' selected' : ''}>${k} – ${n}</option>`).join('');
     return `<div class="charter wide"><div class="rlabel">${esc(f.label)} <span class="hint">prints as ${esc(charterText(S.v, f) || 'SER-TN-173')}</span></div><div class="ch-row">
       <label class="fld">Region<select data-id="${f.id}_reg">${opts}</select></label>
-      <label class="fld">Wing<input data-id="${f.id}_wing" data-upper maxlength="3" placeholder="TN" value="${esc(S.v[f.id + '_wing'] || '')}" autocomplete="off" autocapitalize="characters"></label>
+      <label class="fld">Wing<select data-id="${f.id}_wing">${wingOptions(reg, S.v[f.id + '_wing'] || '')}</select></label>
       <label class="fld">Squadron<input data-id="${f.id}_sq" inputmode="numeric" maxlength="4" placeholder="173" value="${esc(S.v[f.id + '_sq'] || '')}" autocomplete="off"></label></div></div>`;
   }
   const RENDER = { charter: charterField, minutes: minutesField, namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
@@ -216,7 +241,21 @@
   // ---------- events ----------
   const main = () => $('#main');
   document.addEventListener('change', e => {
-    if (e.target.tagName === 'SELECT' && e.target.dataset.id) { S.v[e.target.dataset.id] = e.target.value; save(); refreshCharter(); }
+    if (e.target.tagName === 'SELECT' && e.target.dataset.id) {
+      const id = e.target.dataset.id; S.v[id] = e.target.value;
+      const m = /^(.*)_(reg|wing)$/.exec(id);
+      if (m && ALL.some(f => f.type === 'charter' && f.id === m[1])) {
+        const base = m[1], row = e.target.closest('.ch-row');
+        if (m[2] === 'reg') {
+          if (S.v[base + '_wing'] && !(CAP_WINGS[S.v[id]] || []).includes(S.v[base + '_wing'])) S.v[base + '_wing'] = '';
+          row.querySelector(`[data-id="${base}_wing"]`).innerHTML = wingOptions(S.v[id], S.v[base + '_wing'] || '');
+        } else if (S.v[id] && !S.v[base + '_reg']) {
+          S.v[base + '_reg'] = regionOfWing(S.v[id]); row.querySelector(`[data-id="${base}_reg"]`).value = S.v[base + '_reg'];
+          row.querySelector(`[data-id="${base}_wing"]`).innerHTML = wingOptions(S.v[base + '_reg'], S.v[id]);
+        }
+      }
+      save(); refreshCharter();
+    }
   });
   document.addEventListener('input', e => {
     const id = e.target.dataset && e.target.dataset.id;
