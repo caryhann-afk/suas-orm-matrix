@@ -83,6 +83,15 @@
     <iframe id="pvFrame" title="PDF preview"></iframe></div></div>
   <div class="toast" id="toast" hidden></div>`;
 
+  // Minutes between two HH:MM times (handles crossing midnight)
+  function minutesBetween(a, b) {
+    const m = t => { const x = /^(\d{1,2}):(\d{2})/.exec(t || ''); return x ? +x[1] * 60 + +x[2] : null; };
+    const s0 = m(a), s1 = m(b); if (s0 === null || s1 === null) return '';
+    return String((s1 - s0 + 1440) % 1440);
+  }
+  const autoMinFrom = (v, f) => minutesBetween(v[f.from[0]], v[f.from[1]]);
+  const autoMin = f => autoMinFrom(S.v, f);
+
   // ---------- field renderers ----------
   function inputField(f) {
     const v = S.v[f.id] ?? '';
@@ -130,7 +139,11 @@
       <label class="fld">Grade<select data-id="${f.id}_grade">${opts}</select></label>
       <label class="fld">Name<input data-id="${f.id}_name" value="${esc(S.v[f.id + '_name'] || '')}" autocomplete="name" placeholder="First M. Last"></label></div></div>`;
   }
-  const RENDER = { namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
+  function minutesField(f) {
+    const auto = autoMin(f);
+    return `<label class="fld">${esc(f.label)}<input data-id="${f.id}" data-auto-min="${f.id}" inputmode="numeric" value="${esc(S.v[f.id] || '')}" placeholder="${auto ? auto + ' (auto)' : 'Auto from times'}" autocomplete="off"></label>`;
+  }
+  const RENDER = { minutes: minutesField, namegrade: nameGradeField, text: inputField, date: inputField, time: inputField, textarea: textareaField, check: checkField,
     endorse: endorseField, radio: radioField, grade: gradeField, sig: sigField };
 
   function renderSection(sec, i) {
@@ -144,7 +157,7 @@
       return `<section class="card" data-sec="${i}"><h2>${esc(sec.title)}</h2>${note}${cards}
         <div class="rep-actions"><button type="button" class="primary-outline" data-add="${i}" ${shown >= r.count ? 'disabled' : ''}>+ Add ${r.noun.toLowerCase()} ${Math.min(shown + 1, r.count)}</button>
         ${shown > 1 ? `<button type="button" class="small" data-remove="${i}">Remove ${r.noun.toLowerCase()} ${shown}</button>` : ''}</div>
-        <p class="muted small-text">${shown} of ${r.count} ${r.noun.toLowerCase()}s used. Aircraft number and model carry over to the next ${r.noun.toLowerCase()}.</p></section>`;
+        <p class="muted small-text">${shown} of ${r.count} ${r.noun.toLowerCase()}s used. Date, pilot, technicians and aircraft carry over to the next ${r.noun.toLowerCase()}.</p></section>`;
     }
     const isGrades = sec.items.every(f => f.type === 'grade');
     const quick = isGrades ? `<div class="quick">Mark all:${SCALES[sec.items[0].scale].map(([k, t]) => `<button type="button" class="gb ${GCLASS[k]} mini" data-all="${i}" data-val="${k}">${t}</button>`).join('')}<button type="button" class="small mini" data-all="${i}" data-val="">Clear</button></div>` : '';
@@ -187,6 +200,10 @@
     let val = e.target.value;
     if (/_init$/.test(id)) { val = val.toUpperCase(); e.target.value = val; }
     S.v[id] = val; save();
+    document.querySelectorAll('[data-auto-min]').forEach(el => {
+      const f = ALL.find(x => x.id === el.dataset.autoMin); const a = autoMin(f);
+      el.placeholder = a ? a + ' (auto)' : 'Auto from times';
+    });
   });
   document.addEventListener('click', e => {
     const t = e.target.closest('button');
@@ -411,6 +428,7 @@
           break;
         }
         case 'date': text(f.page, f.box, fmtDate(val), { align: f.align, size: f.size }); break;
+        case 'minutes': text(f.page, f.box, (val && String(val).trim()) || autoMinFrom(v, f), { align: f.align, size: f.size }); break;
         case 'namegrade': text(f.page, f.box, [v[f.id + '_grade'], v[f.id + '_name']].filter(Boolean).join(' '), { align: f.align, size: f.size }); break;
         case 'textarea': para(f.page, f.box, val, f.size); break;
         case 'check': if (val) xmark(f.page, f.box); break;

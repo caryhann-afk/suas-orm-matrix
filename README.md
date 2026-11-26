@@ -7,7 +7,7 @@ Main page (`public/index.html`) links to each form; each form lives in its own f
 ## Forms
 - `public/orm/` – **sUAS Operational Risk Management Matrix** (Revised 1 DEC 22)
 - `public/f5u/` – **CAPF 70-5U sUAS Pilot Flight Evaluation** (1 DEC 22)
-- `public/f109u/` – **CAPF 109U sUAS Sortie Flight Summary & Log** (NOV 18)
+- `public/f109u/` – **CAPF 109U sUAS Sortie Flight Summary & Imagery/Target Log** (DEC 22)
 - `public/f91/` – **CAPF 70-91 Mission Pilot Checkout** (31 MAR 20)
 
 The 70-5U, 109U and 70-91 run on a shared engine (`public/shared/engine.js`). Each form folder has `form.pdf` (the blank original)
