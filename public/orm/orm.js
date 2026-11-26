@@ -145,9 +145,10 @@
       color: rgb(...color), opacity, borderWidth: 0, blendMode: BlendMode.Multiply,
     });
 
+    const okChars = new Set(font.getCharacterSet());
     const text = (str, x, row, opts = {}) => {
       if (str === undefined || str === null || str === '') return;
-      str = String(str);
+      str = Array.from(String(str)).map(ch => okChars.has(ch.codePointAt(0)) ? ch : ({ '\u2018': "'", '\u2019': "'", '\u201C': '"', '\u201D': '"', '\u2013': '-', '\u2014': '-' }[ch] || '')).join('');
       const f = opts.bold ? bold : font;
       let size = opts.size || 8.5;
       const maxW = x[1] - x[0] - 4;
